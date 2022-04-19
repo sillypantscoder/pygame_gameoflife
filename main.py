@@ -10,6 +10,12 @@ BOARDSIZE = (80, 80)
 BOARD = [[random.choice([0, 1]) for x in range(BOARDSIZE[0])] for y in range(BOARDSIZE[1])]
 CELLSIZE = 10
 
+def next_frame():
+	global BOARD
+	for x in range(BOARDSIZE[0]):
+		for y in range(BOARDSIZE[1]):
+			BOARD[x][y] = random.choice([0, 1])
+
 c = pygame.time.Clock()
 running = True
 while running:
@@ -19,6 +25,9 @@ while running:
 		elif event.type == pygame.VIDEORESIZE:
 			SCREENSIZE = event.size
 			screen = pygame.display.set_mode(SCREENSIZE, pygame.RESIZABLE)
+		elif event.type == pygame.KEYDOWN:
+			if event.key == pygame.K_SPACE:
+				next_frame()
 	screen.fill(WHITE)
 	for x in range(BOARDSIZE[0]):
 		for y in range(BOARDSIZE[1]):
