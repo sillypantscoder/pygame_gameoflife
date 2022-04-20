@@ -83,22 +83,13 @@ def findCellIndex(c: Cell, board: "list | None" = None) -> "tuple[int, int]":
 			return (x, board[x].index(c))
 		except ValueError: pass
 
-def generate_frame():
-	"""Generates the next frame of the game"""
-	newBoard = [[Cell() for x in range(BOARDSIZE[0])] for y in range(BOARDSIZE[1])]
-	for x in range(BOARDSIZE[0]):
-		for y in range(BOARDSIZE[1]):
-			newBoard[x][y].state = BOARD[x][y].run()
-	return newBoard
-
 def next_frame():
 	"""Switches to the next frame of the game"""
 	global BOARD
 	global BOARDCACHES
-	if len(BOARDCACHES) == 0:
-		BOARD = generate_frame()
-	else:
-		BOARD = BOARDCACHES.pop(0)
+	if len(BOARDCACHES) == 0: return
+	# Load the next frame from cache
+	BOARD = BOARDCACHES.pop(0)
 	preload_frame()
 
 def cache_frame():
@@ -134,16 +125,17 @@ BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
 pygame.font.init()
 FONT = pygame.font.SysFont("monospace", 16)
+FONTHEIGHT = FONT.render("0", True, BLACK).get_height()
 
 STATES = [
 	lambda s, b: (s.eightDirections(b).count(1) == 3) * 1,
 	lambda s, b: (s.eightDirections(b).count(1) in [2, 3]) * 1
 ]
-SCREENSIZE = [500, 500]
-screen = pygame.display.set_mode(SCREENSIZE, pygame.RESIZABLE)
-BOARDSIZE = (40, 40)
-BOARD = [[Cell() for x in range(BOARDSIZE[0])] for y in range(BOARDSIZE[1])]
 CELLSIZE = 10
+BOARDSIZE = (30, 30)
+SCREENSIZE = [BOARDSIZE[0] * CELLSIZE, (BOARDSIZE[1] * CELLSIZE) + FONTHEIGHT]
+screen = pygame.display.set_mode(SCREENSIZE, pygame.RESIZABLE)
+BOARD = [[Cell() for x in range(BOARDSIZE[0])] for y in range(BOARDSIZE[1])]
 BOARDCACHES = []
 
 running = True
@@ -161,6 +153,13 @@ while running:
 		elif event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_SPACE:
 				next_frame()
+		elif event.type == pygame.MOUSEBUTTONDOWN:
+			pos = pygame.mouse.get_pos()
+			x, y = pos[0] // CELLSIZE, pos[1] // CELLSIZE
+			if x < BOARDSIZE[0] and y < BOARDSIZE[1]:
+				# clicked a cell!
+				BOARD[x][y].state = (BOARD[x][y].state + 1) % 2
+				BOARDCACHES = [] # Reset the cache
 	# Draw the board
 	keys = pygame.key.get_pressed()
 	if keys[pygame.K_z]: next_frame()
