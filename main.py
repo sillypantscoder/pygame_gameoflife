@@ -4,6 +4,7 @@ import threading
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+GRAY = (200, 200, 200)
 pygame.font.init()
 FONT = pygame.font.SysFont("monospace", 16)
 
@@ -94,7 +95,7 @@ STATES = [
 ]
 SCREENSIZE = [500, 500]
 screen = pygame.display.set_mode(SCREENSIZE, pygame.RESIZABLE)
-BOARDSIZE = (20, 20)
+BOARDSIZE = (40, 40)
 BOARD = [[Cell() for x in range(BOARDSIZE[0])] for y in range(BOARDSIZE[1])]
 CELLSIZE = 10
 BOARDCACHES = []
@@ -138,7 +139,7 @@ def preload_frame():
 	if preloading: return # Already preloading
 	preloading = True
 	if not running: preloading = False
-	if len(BOARDCACHES) > 30: preloading = False
+	if len(BOARDCACHES) >= 100: preloading = False
 	if not preloading: return
 	t = threading.Thread(target=cache_frame, name="next_frame", args=[])
 	t.start()
@@ -160,12 +161,14 @@ while running:
 				next_frame()
 	keys = pygame.key.get_pressed()
 	if keys[pygame.K_z]: next_frame()
-	screen.fill(WHITE)
+	screen.fill(GRAY)
 	for x in range(BOARDSIZE[0]):
 		for y in range(BOARDSIZE[1]):
 			cellrect = pygame.Rect(x * CELLSIZE, y * CELLSIZE, CELLSIZE, CELLSIZE)
 			cell = BOARD[x][y]
-			if cell.state == 1:
+			if cell.state == 0:
+				pygame.draw.rect(screen, WHITE, cellrect)
+			elif cell.state == 1:
 				pygame.draw.rect(screen, BLACK, cellrect)
 	cachetext = FONT.render("Cached frames: " + str(len(BOARDCACHES)), True, BLACK)
 	screen.blit(cachetext, (0, SCREENSIZE[1] - cachetext.get_height()))
