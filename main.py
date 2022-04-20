@@ -1,6 +1,7 @@
 import pygame
 import random
 import threading
+from gameoflife import STATES
 
 class Cell:
 	exists: bool = True
@@ -127,10 +128,6 @@ pygame.font.init()
 FONT = pygame.font.SysFont("monospace", 16)
 FONTHEIGHT = FONT.render("0", True, BLACK).get_height()
 
-STATES = [
-	lambda s, b: (s.eightDirections(b).count(1) == 3) * 1,
-	lambda s, b: (s.eightDirections(b).count(1) in [2, 3]) * 1
-]
 CELLSIZE = 10
 BOARDSIZE = (30, 30)
 SCREENSIZE = [BOARDSIZE[0] * CELLSIZE, (BOARDSIZE[1] * CELLSIZE) + FONTHEIGHT]
