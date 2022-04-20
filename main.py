@@ -2,12 +2,6 @@ import pygame
 import random
 import threading
 
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-GRAY = (200, 200, 200)
-pygame.font.init()
-FONT = pygame.font.SysFont("monospace", 16)
-
 class Cell:
 	exists: bool = True
 	def __init__(self):
@@ -89,17 +83,6 @@ def findCellIndex(c: Cell, board: "list | None" = None) -> "tuple[int, int]":
 			return (x, board[x].index(c))
 		except ValueError: pass
 
-STATES = [
-	lambda s, b: (s.eightDirections(b).count(1) == 3) * 1,
-	lambda s, b: (s.eightDirections(b).count(1) in [2, 3]) * 1
-]
-SCREENSIZE = [500, 500]
-screen = pygame.display.set_mode(SCREENSIZE, pygame.RESIZABLE)
-BOARDSIZE = (40, 40)
-BOARD = [[Cell() for x in range(BOARDSIZE[0])] for y in range(BOARDSIZE[1])]
-CELLSIZE = 10
-BOARDCACHES = []
-
 def generate_frame():
 	"""Generates the next frame of the game"""
 	newBoard = [[Cell() for x in range(BOARDSIZE[0])] for y in range(BOARDSIZE[1])]
@@ -131,7 +114,7 @@ def cache_frame():
 			newBoard[x][y].state = oldboard[x][y].run(oldboard)
 	BOARDCACHES.append(newBoard)
 	preloading = False
-	preload_frame()
+	preload_frame() # Start preloading if we aren't already
 
 def preload_frame():
 	"""Asyncronously generates and caches the next frame of the game"""
@@ -143,6 +126,25 @@ def preload_frame():
 	if not preloading: return
 	t = threading.Thread(target=cache_frame, name="next_frame", args=[])
 	t.start()
+
+# INITIALIZATION -----------------------------------------------------------------------------------------------
+
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+GRAY = (200, 200, 200)
+pygame.font.init()
+FONT = pygame.font.SysFont("monospace", 16)
+
+STATES = [
+	lambda s, b: (s.eightDirections(b).count(1) == 3) * 1,
+	lambda s, b: (s.eightDirections(b).count(1) in [2, 3]) * 1
+]
+SCREENSIZE = [500, 500]
+screen = pygame.display.set_mode(SCREENSIZE, pygame.RESIZABLE)
+BOARDSIZE = (40, 40)
+BOARD = [[Cell() for x in range(BOARDSIZE[0])] for y in range(BOARDSIZE[1])]
+CELLSIZE = 10
+BOARDCACHES = []
 
 running = True
 preloading = False
@@ -159,9 +161,10 @@ while running:
 		elif event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_SPACE:
 				next_frame()
+	# Draw the board
 	keys = pygame.key.get_pressed()
 	if keys[pygame.K_z]: next_frame()
-	screen.fill(GRAY)
+	screen.fill(GRAY) # Background
 	for x in range(BOARDSIZE[0]):
 		for y in range(BOARDSIZE[1]):
 			cellrect = pygame.Rect(x * CELLSIZE, y * CELLSIZE, CELLSIZE, CELLSIZE)
@@ -170,6 +173,7 @@ while running:
 				pygame.draw.rect(screen, WHITE, cellrect)
 			elif cell.state == 1:
 				pygame.draw.rect(screen, BLACK, cellrect)
+	# Cache text and flip the screen
 	cachetext = FONT.render("Cached frames: " + str(len(BOARDCACHES)), True, BLACK)
 	screen.blit(cachetext, (0, SCREENSIZE[1] - cachetext.get_height()))
 	pygame.display.flip()
