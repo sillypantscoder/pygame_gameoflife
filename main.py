@@ -1,7 +1,7 @@
 import pygame
 import random
 import threading
-from gameoflife import STATES
+from generators.gameoflife import STATES, COLORS
 
 class Cell:
 	exists: bool = True
@@ -114,7 +114,7 @@ def preload_frame():
 	if preloading: return # Already preloading
 	preloading = True
 	if not running: preloading = False
-	if len(BOARDCACHES) >= 100: preloading = False
+	#if len(BOARDCACHES) >= 100: preloading = False
 	if not preloading: return
 	t = threading.Thread(target=cache_frame, name="next_frame", args=[])
 	t.start()
@@ -128,7 +128,7 @@ pygame.font.init()
 FONT = pygame.font.SysFont("monospace", 16)
 FONTHEIGHT = FONT.render("0", True, BLACK).get_height()
 
-CELLSIZE = 10
+CELLSIZE = 15
 BOARDSIZE = (30, 30)
 SCREENSIZE = [BOARDSIZE[0] * CELLSIZE, (BOARDSIZE[1] * CELLSIZE) + FONTHEIGHT]
 screen = pygame.display.set_mode(SCREENSIZE, pygame.RESIZABLE)
@@ -165,10 +165,8 @@ while running:
 		for y in range(BOARDSIZE[1]):
 			cellrect = pygame.Rect(x * CELLSIZE, y * CELLSIZE, CELLSIZE, CELLSIZE)
 			cell = BOARD[x][y]
-			if cell.state == 0:
-				pygame.draw.rect(screen, WHITE, cellrect)
-			elif cell.state == 1:
-				pygame.draw.rect(screen, BLACK, cellrect)
+			pygame.draw.rect(screen, COLORS[cell.state], cellrect)
+			pygame.draw.rect(screen, BLACK, cellrect, 1)
 	# Cache text and flip the screen
 	cachetext = FONT.render("Cached frames: " + str(len(BOARDCACHES)), True, BLACK)
 	screen.blit(cachetext, (0, SCREENSIZE[1] - cachetext.get_height()))
