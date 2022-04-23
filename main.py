@@ -1,7 +1,17 @@
 import pygame
 import random
 import threading
-from generators.gameoflife import STATES, COLORS
+import importlib
+import selector
+import os
+
+gen = []
+for g in os.listdir("generators"):
+	if g == "__pycache__": continue
+	gen.append(g[:-3])
+
+v = importlib.import_module("generators." + gen[selector.selector("Select Generator", gen)])
+COLORS, STATES = v.COLORS, v.STATES
 
 class Cell:
 	exists: bool = True
@@ -114,7 +124,7 @@ def preload_frame():
 	if preloading: return # Already preloading
 	preloading = True
 	if not running: preloading = False
-	#if len(BOARDCACHES) >= 100: preloading = False
+	if len(BOARDCACHES) >= 100: preloading = False
 	if not preloading: return
 	t = threading.Thread(target=cache_frame, name="next_frame", args=[])
 	t.start()
