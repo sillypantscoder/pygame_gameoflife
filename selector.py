@@ -18,7 +18,7 @@ def selector(header, items: list):
 		w = FONT.render(i, True, BLACK)
 		if w.get_width() > scrn_width:
 			scrn_width = w.get_width()
-	screen = pygame.display.set_mode([scrn_width, scrn_height])
+	screen = pygame.display.set_mode([scrn_width, scrn_height], pygame.RESIZABLE)
 	running = True
 	c = pygame.time.Clock()
 	while running:
