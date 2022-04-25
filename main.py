@@ -17,6 +17,7 @@ class Cell:
 	exists: bool = True
 	def __init__(self):
 		self.state: int = random.choice([0, 1])
+		self.index = None
 	def up(self, board: "list | None" = None) -> int:
 		if board == None: board = BOARD
 		pos = findCellIndex(self, board)
@@ -88,9 +89,11 @@ class NullCell:
 	def __repr__(self) -> str: return "NullCell"
 
 def findCellIndex(c: Cell, board: "list | None" = None) -> "tuple[int, int]":
+	if c.index: return c.index
 	if board == None: board = BOARD
 	for x in range(BOARDSIZE[0]):
 		try:
+			c.index = (x, board[x].index(c))
 			return (x, board[x].index(c))
 		except ValueError: pass
 
