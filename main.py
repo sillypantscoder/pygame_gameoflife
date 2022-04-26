@@ -10,7 +10,27 @@ for g in os.listdir("generators"):
 	if g == "__pycache__": continue
 	gen.append(g[:-3])
 
-v = importlib.import_module("generators." + gen[selector.selector("Select Generator", gen)])
+def getDetails(g):
+	f = open("generators/" + g + ".py", "r")
+	f.readline()
+	r = f.readline()
+	for i in range(10):
+		n = f.readline()
+		if n == "\"\"\"\n": break
+		r += n
+	f.close()
+	return r[:-1]
+
+def selectgenerator():
+	while True:
+		g = selector.selector("Select a generator", gen)
+		if g == -1: exit()
+		g = gen[g]
+		details = getDetails(g)
+		confirm = selector.selector(g, ["", *details.split("\n"), "", "Go >", "< Back"]) == len(details.split("\n")) + 2
+		if confirm: return g
+
+v = importlib.import_module("generators." + selectgenerator())
 COLORS, STATES = v.COLORS, v.STATES
 
 class Cell:

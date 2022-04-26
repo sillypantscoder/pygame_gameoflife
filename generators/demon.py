@@ -1,3 +1,9 @@
+"""
+Demon - Implements the XScreenSaver "Demon".
+Each frame, each cell "eats" a cell of
+the previous color.
+"""
+
 import colorsys
 
 NUMSTATES = 12
