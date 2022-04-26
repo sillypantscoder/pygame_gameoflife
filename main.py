@@ -131,13 +131,15 @@ def cache_frame():
 	global BOARDCACHES
 	global BOARD
 	global preloading
+	global board_modified
 	oldboard = BOARD
 	if len(BOARDCACHES) != 0: oldboard = BOARDCACHES[-1]
 	newBoard = [[Cell() for x in range(BOARDSIZE[0])] for y in range(BOARDSIZE[1])]
 	for x in range(BOARDSIZE[0]):
 		for y in range(BOARDSIZE[1]):
 			newBoard[x][y].state = oldboard[x][y].run(oldboard)
-	BOARDCACHES.append(newBoard)
+	if not board_modified: BOARDCACHES.append(newBoard)
+	board_modified = False
 	preloading = False
 	preload_frame() # Start preloading if we aren't already
 
@@ -167,10 +169,12 @@ SCREENSIZE = [BOARDSIZE[0] * CELLSIZE, (BOARDSIZE[1] * CELLSIZE) + FONTHEIGHT]
 screen = pygame.display.set_mode(SCREENSIZE, pygame.RESIZABLE)
 BOARD = [[Cell() for x in range(BOARDSIZE[0])] for y in range(BOARDSIZE[1])]
 BOARDCACHES = []
+board_modified = False
 
 running = True
 preloading = False
 preload_frame()
+clicknum = None
 
 c = pygame.time.Clock()
 while running:
@@ -188,8 +192,19 @@ while running:
 			x, y = pos[0] // CELLSIZE, pos[1] // CELLSIZE
 			if x < BOARDSIZE[0] and y < BOARDSIZE[1]:
 				# clicked a cell!
-				BOARD[x][y].state = (BOARD[x][y].state + 1) % 2
-				BOARDCACHES = [] # Reset the cache
+				clicknum = (BOARD[x][y].state + 1) % len(STATES)
+				BOARD[x][y].state = clicknum
+				BOARDCACHES = []; board_modified = False # Reset the cache
+		elif event.type == pygame.MOUSEMOTION:
+			pos = pygame.mouse.get_pos()
+			x, y = pos[0] // CELLSIZE, pos[1] // CELLSIZE
+			if x < BOARDSIZE[0] and y < BOARDSIZE[1]:
+				# Hovering over a cell!
+				if clicknum:
+					BOARD[x][y].state = clicknum
+					BOARDCACHES = []; board_modified = False # Reset the cache
+		elif event.type == pygame.MOUSEBUTTONUP:
+			clicknum = None
 	# Draw the board
 	keys = pygame.key.get_pressed()
 	if keys[pygame.K_z]: next_frame()
