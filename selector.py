@@ -48,33 +48,3 @@ def selector(header, items: list):
 						return math.floor((pos[1] - FONTHEIGHT) / FONTHEIGHT)
 		c.tick(60)
 		pygame.display.flip()
-
-def progress(text):
-	global screen
-	rendered = FONT.render(text, True, BLACK)
-	scrn_height = rendered.get_height() + 10
-	scrn_width = rendered.get_width() + 10
-	screen = pygame.display.set_mode([scrn_width, scrn_height], pygame.RESIZABLE)
-	running = text
-	while running:
-		rendered = FONT.render(running, True, BLACK)
-		screen.fill(WHITE)
-		if scrn_height < rendered.get_height() + 10:
-			scrn_height = rendered.get_height() + 10
-			screen = pygame.display.set_mode([scrn_width, scrn_height], pygame.RESIZABLE)
-		if scrn_width < rendered.get_width() + 10:
-			scrn_width = rendered.get_width() + 10
-			screen = pygame.display.set_mode([scrn_width, scrn_height], pygame.RESIZABLE)
-		# Events
-		for event in pygame.event.get():
-				if event.type == pygame.QUIT:
-					return;
-					# User clicked close button
-				elif event.type == pygame.VIDEORESIZE:
-					scrn_height = event.h
-					scrn_width = event.w
-					screen = pygame.display.set_mode([scrn_width, scrn_height], pygame.RESIZABLE)
-		# Header
-		screen.blit(rendered, ((scrn_width - rendered.get_width()) / 2, (scrn_height - rendered.get_height()) / 2))
-		pygame.display.flip()
-		running = yield;

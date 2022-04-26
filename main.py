@@ -10,13 +10,34 @@ for g in os.listdir("generators"):
 	if g == "__pycache__": continue
 	gen.append(g[:-3])
 
-v = importlib.import_module("generators." + gen[selector.selector("Select Generator", gen)])
+def getDetails(g):
+	f = open("generators/" + g + ".py", "r")
+	f.readline()
+	r = f.readline()
+	for i in range(10):
+		n = f.readline()
+		if n == "\"\"\"\n": break
+		r += n
+	f.close()
+	return r[:-1]
+
+def selectgenerator():
+	while True:
+		g = selector.selector("Select a generator", gen)
+		if g == -1: exit()
+		g = gen[g]
+		details = getDetails(g)
+		confirm = selector.selector(g, ["", *details.split("\n"), "", "Go >", "< Back"]) == len(details.split("\n")) + 2
+		if confirm: return g
+
+v = importlib.import_module("generators." + selectgenerator())
 COLORS, STATES = v.COLORS, v.STATES
 
 class Cell:
 	exists: bool = True
 	def __init__(self):
-		self.state: int = random.choice([0, 1])
+		self.state: int = random.choice([i for i in range(len(STATES))])
+		self.index = None
 	def up(self, board: "list | None" = None) -> int:
 		if board == None: board = BOARD
 		pos = findCellIndex(self, board)
@@ -41,7 +62,7 @@ class Cell:
 		try:
 			return board[pos[0] + 1][pos[1]]
 		except: return NullCell()
-	def fourdirections(self, board: "list | None" = None):
+	def fourDirections(self, board: "list | None" = None):
 		if board == None: board = BOARD
 		r = CellGroup()
 		if self.up().exists: r.add(self.up())
@@ -88,9 +109,11 @@ class NullCell:
 	def __repr__(self) -> str: return "NullCell"
 
 def findCellIndex(c: Cell, board: "list | None" = None) -> "tuple[int, int]":
+	if c.index: return c.index
 	if board == None: board = BOARD
 	for x in range(BOARDSIZE[0]):
 		try:
+			c.index = (x, board[x].index(c))
 			return (x, board[x].index(c))
 		except ValueError: pass
 

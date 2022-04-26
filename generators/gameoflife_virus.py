@@ -1,3 +1,10 @@
+"""
+Game Of List (Virus) - Conway's Game of Life...
+but with a virus eating the cells!
+I invented this one a while back when I
+got tired of the boring game of life.
+"""
+
 def state0(cell, board):
    e = cell.eightDirections(board)
    if e.count(3) > 0: return 2
@@ -13,12 +20,12 @@ def state1(cell, board):
 STATES = [
 	lambda s, b: state0(s, b),
 	lambda s, b: state1(s, b),
-    lambda s, b: 0,
-    lambda s, b: 0
+	lambda s, b: 0,
+	lambda s, b: 0
 ]
 COLORS = [
 	(255, 255, 255),
 	(0, 0, 0),
-    (255, 0, 0),
-    (255, 165, 0)
+	(255, 0, 0),
+	(255, 165, 0)
 ]
