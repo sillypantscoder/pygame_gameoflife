@@ -31,12 +31,12 @@ def selectgenerator():
 		if confirm: return g
 
 v = importlib.import_module("generators." + selectgenerator())
-COLORS, STATES = v.COLORS, v.STATES
+COLORS, STATES, RANDSTATES = v.COLORS, v.STATES, v.RANDSTATES
 
 class Cell:
 	exists: bool = True
 	def __init__(self):
-		self.state: int = random.choice([i for i in range(len(STATES))])
+		self.state: int = random.choice(RANDSTATES)
 		self.index = None
 	def up(self, board: "list | None" = None) -> int:
 		if board == None: board = BOARD

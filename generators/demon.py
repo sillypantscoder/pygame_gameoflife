@@ -26,3 +26,4 @@ STATES = [
 COLORS = [
 	hsv2rgb(i / 360, 1, 1) for i in range(0, 360, 360 // len(STATES))
 ]
+RANDSTATES = [*range(NUMSTATES)]
