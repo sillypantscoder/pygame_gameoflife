@@ -38,37 +38,25 @@ class Cell:
 	def __init__(self):
 		self.state: int = random.choice(RANDSTATES)
 		self.index = None
-	def up(self, board: "list | None" = None) -> int:
+	def transform(self, dir: "tuple[int, int]", board: "list | None" = None):
 		if board == None: board = BOARD
-		pos = findCellIndex(self, board)
-		try:
-			return board[pos[0]][pos[1] - 1]
-		except: return NullCell()
-	def down(self, board: "list | None" = None) -> int:
-		if board == None: board = BOARD
-		pos = findCellIndex(self, board)
-		try:
-			return board[pos[0]][pos[1] + 1]
-		except: return NullCell()
-	def left(self, board: "list | None" = None) -> int:
-		if board == None: board = BOARD
-		pos = findCellIndex(self, board)
-		try:
-			return board[pos[0] - 1][pos[1]]
-		except: return NullCell()
-	def right(self, board: "list | None" = None) -> int:
-		if board == None: board = BOARD
-		pos = findCellIndex(self, board)
-		try:
-			return board[pos[0] + 1][pos[1]]
-		except: return NullCell()
+		pos = [*findCellIndex(self, board)]
+		pos[0] += dir[0]
+		pos[1] += dir[1]
+		if insideBoard(*pos):
+			return board[pos[0]][pos[1]]
+		else: return NullCell()
+	def up(self, board: "list | None" = None) -> int: return self.transform((0, -1), board)
+	def down(self, board: "list | None" = None) -> int: return self.transform((0, 1), board)
+	def left(self, board: "list | None" = None) -> int: return self.transform((-1, 0), board)
+	def right(self, board: "list | None" = None) -> int: return self.transform((1, 0), board)
 	def fourDirections(self, board: "list | None" = None):
 		if board == None: board = BOARD
 		r = CellGroup()
-		if self.up().exists: r.add(self.up())
-		if self.down().exists: r.add(self.down())
-		if self.left().exists: r.add(self.left())
-		if self.right().exists: r.add(self.right())
+		if self.up(board).exists: r.add(self.up(board))
+		if self.down(board).exists: r.add(self.down(board))
+		if self.left(board).exists: r.add(self.left(board))
+		if self.right(board).exists: r.add(self.right(board))
 		return r
 	def eightDirections(self, board: "list | None" = None):
 		if board == None: board = BOARD
@@ -116,15 +104,16 @@ def findCellIndex(c: Cell, board: "list | None" = None) -> "tuple[int, int]":
 			c.index = (x, board[x].index(c))
 			return (x, board[x].index(c))
 		except ValueError: pass
+	raise ValueError("Cell not in board!")
 
 def next_frame():
 	"""Switches to the next frame of the game"""
 	global BOARD
 	global BOARDCACHES
+	preload_frame()
 	if len(BOARDCACHES) == 0: return
 	# Load the next frame from cache
 	BOARD = BOARDCACHES.pop(0)
-	preload_frame()
 
 def cache_frame():
 	"""Generates and caches the next frame of the game"""
@@ -165,6 +154,7 @@ FONTHEIGHT = FONT.render("0", True, BLACK).get_height()
 
 CELLSIZE = 15
 BOARDSIZE = (30, 30)
+def insideBoard(x: int, y: int) -> bool: return x >= 0 and x < BOARDSIZE[0] and y >= 0 and y < BOARDSIZE[1]
 SCREENSIZE = [BOARDSIZE[0] * CELLSIZE, (BOARDSIZE[1] * CELLSIZE) + FONTHEIGHT]
 screen = pygame.display.set_mode(SCREENSIZE, pygame.RESIZABLE)
 BOARD = [[Cell() for x in range(BOARDSIZE[0])] for y in range(BOARDSIZE[1])]
