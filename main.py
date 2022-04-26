@@ -16,7 +16,7 @@ COLORS, STATES = v.COLORS, v.STATES
 class Cell:
 	exists: bool = True
 	def __init__(self):
-		self.state: int = random.choice([0, 1])
+		self.state: int = random.choice([i for i in range(len(STATES))])
 		self.index = None
 	def up(self, board: "list | None" = None) -> int:
 		if board == None: board = BOARD
@@ -42,7 +42,7 @@ class Cell:
 		try:
 			return board[pos[0] + 1][pos[1]]
 		except: return NullCell()
-	def fourdirections(self, board: "list | None" = None):
+	def fourDirections(self, board: "list | None" = None):
 		if board == None: board = BOARD
 		r = CellGroup()
 		if self.up().exists: r.add(self.up())

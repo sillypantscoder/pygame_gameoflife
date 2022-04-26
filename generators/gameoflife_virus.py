@@ -13,12 +13,12 @@ def state1(cell, board):
 STATES = [
 	lambda s, b: state0(s, b),
 	lambda s, b: state1(s, b),
-    lambda s, b: 0,
-    lambda s, b: 0
+	lambda s, b: 0,
+	lambda s, b: 0
 ]
 COLORS = [
 	(255, 255, 255),
 	(0, 0, 0),
-    (255, 0, 0),
-    (255, 165, 0)
+	(255, 0, 0),
+	(255, 165, 0)
 ]
