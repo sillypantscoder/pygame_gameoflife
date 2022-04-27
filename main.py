@@ -127,7 +127,12 @@ def cache_frame():
 	for x in range(BOARDSIZE[0]):
 		for y in range(BOARDSIZE[1]):
 			newBoard[x][y].state = oldboard[x][y].run(oldboard)
-	if not board_modified: BOARDCACHES.append(newBoard)
+	if not board_modified:
+		for i in BOARDCACHES:
+			if [[c.state for c in row] for row in i] == [[c.state for c in row] for row in newBoard]:
+				preloading = False
+				return
+		BOARDCACHES.append(newBoard)
 	board_modified = False
 	preloading = False
 	preload_frame() # Start preloading if we aren't already
@@ -138,7 +143,7 @@ def preload_frame():
 	if preloading: return # Already preloading
 	preloading = True
 	if not running: preloading = False
-	if len(BOARDCACHES) >= 100: preloading = False
+	if len(BOARDCACHES) >= 200: preloading = False
 	if not preloading: return
 	t = threading.Thread(target=cache_frame, name="next_frame", args=[])
 	t.start()
