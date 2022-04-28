@@ -2,7 +2,7 @@ import pygame
 import random
 import threading
 import importlib
-import selector
+import ui
 import os
 
 gen = []
@@ -23,15 +23,13 @@ def getDetails(g):
 
 def selectgenerator():
 	while True:
-		g = selector.selector("Select a generator", gen)
+		g = ui.menu("Select a generator", gen)
 		if g == -1: exit()
 		g = gen[g]
 		details = getDetails(g)
-		confirm = selector.selector(g, ["", *details.split("\n"), "", "Go >", "< Back"]) == len(details.split("\n")) + 2
+		#confirm = ui.listmenu(g, ["", *details.split("\n"), "", "Go >", "< Back"]) == len(details.split("\n")) + 2
+		confirm = ui.listmenu(lambda x: [ui.Header(g), ui.Text(""), *[ui.Text(t) for t in details.split("\n")], ui.Text(""), ui.Button("Go >").addclick(lambda: x(True)), ui.Button("< Back").addclick(lambda: x(False))])
 		if confirm: return g
-
-v = importlib.import_module("generators." + selectgenerator())
-COLORS, STATES, RANDSTATES = v.COLORS, v.STATES, v.RANDSTATES
 
 class Cell:
 	exists: bool = True
@@ -158,9 +156,13 @@ FONT = pygame.font.SysFont("monospace", 16)
 FONTHEIGHT = FONT.render("0", True, BLACK).get_height()
 
 CELLSIZE = 15
-BOARDSIZE = (30, 30)
+BOARDSIZE = (49, 49)
 def insideBoard(x: int, y: int) -> bool: return x >= 0 and x < BOARDSIZE[0] and y >= 0 and y < BOARDSIZE[1]
 SCREENSIZE = [BOARDSIZE[0] * CELLSIZE, (BOARDSIZE[1] * CELLSIZE) + FONTHEIGHT]
+screen = pygame.display.set_mode((500, 500), pygame.RESIZABLE)
+ui.init(screen, pygame.font.SysFont(pygame.font.get_default_font(), 50))
+v = importlib.import_module("generators." + selectgenerator())
+COLORS, STATES, RANDSTATES = v.COLORS, v.STATES, v.RANDSTATES
 screen = pygame.display.set_mode(SCREENSIZE, pygame.RESIZABLE)
 BOARD = [[Cell() for x in range(BOARDSIZE[0])] for y in range(BOARDSIZE[1])]
 BOARDCACHES = []
