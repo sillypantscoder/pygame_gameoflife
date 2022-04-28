@@ -160,7 +160,7 @@ BOARDSIZE = (49, 49)
 def insideBoard(x: int, y: int) -> bool: return x >= 0 and x < BOARDSIZE[0] and y >= 0 and y < BOARDSIZE[1]
 SCREENSIZE = [BOARDSIZE[0] * CELLSIZE, (BOARDSIZE[1] * CELLSIZE) + FONTHEIGHT]
 screen = pygame.display.set_mode((500, 500), pygame.RESIZABLE)
-ui.init(screen, pygame.font.SysFont(pygame.font.get_default_font(), 50))
+ui.init(screen, pygame.font.SysFont(pygame.font.get_default_font(), 30))
 v = importlib.import_module("generators." + selectgenerator())
 COLORS, STATES, RANDSTATES = v.COLORS, v.STATES, v.RANDSTATES
 screen = pygame.display.set_mode(SCREENSIZE, pygame.RESIZABLE)
